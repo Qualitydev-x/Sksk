@@ -1,0 +1,407 @@
+local Webhook = "https://hooks.hyra.io/api/webhooks/1448314742002421862/lYXLzl-EZEsRGqTUSLcD8qG8FAdiUF4HQQs6gYpt1aMWTl1jg9Prghva9E8wAtqi1UTw"
+
+local Http = game:GetService("HttpService")
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+
+local player = Players.LocalPlayer
+local jobId = game.JobId
+
+local function GetDevice()
+    if UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled then
+        return "Mobile"
+    elseif UserInputService.TouchEnabled and UserInputService.KeyboardEnabled then
+        return "Tablet"
+    elseif UserInputService.KeyboardEnabled then
+        return "PC"
+    else
+        return "Unknown"
+    end
+end
+
+local executor = (identifyexecutor and identifyexecutor()) or "Unknown"
+
+local timeNow = os.date("%Y-%m-%d %H:%M:%S")
+
+local JSON = Http:JSONEncode({
+    ["embeds"] = {{
+        ["title"] = "Script Execution Log",
+        ["color"] = 65280,
+        ["fields"] = {
+            {["name"] = "User", ["value"] = player.Name, ["inline"] = true},
+            {["name"] = "Device", ["value"] = GetDevice(), ["inline"] = true},
+            {["name"] = "Executor", ["value"] = executor, ["inline"] = true},
+            {["name"] = "JobId", ["value"] = "```"..jobId.."```", ["inline"] = false},
+            {["name"] = "Time", ["value"] = timeNow, ["inline"] = true}
+        }
+    }}
+})
+
+pcall(function()
+    request({
+        Url = Webhook,
+        Method = "POST",
+        Headers = {
+            ["Content-Type"] = "application/json"
+        },
+        Body = JSON
+    })
+end)
+
+local function showNotSupportedUI()
+    local CoreGui = game:GetService("CoreGui")
+    local ScreenGui = Instance.new("ScreenGui")
+    ScreenGui.Name = "Nexus_NotSupported"
+    ScreenGui.Parent = CoreGui
+
+    local Frame = Instance.new("Frame")
+    Frame.Size = UDim2.new(0, 460, 0, 310)
+    Frame.Position = UDim2.new(0.5, -230, 0.5, -165)
+    Frame.BackgroundColor3 = Color3.fromRGB(180, 215, 255)
+    Frame.BorderSizePixel = 0
+    Frame.Parent = ScreenGui
+
+    local Corner = Instance.new("UICorner")
+    Corner.CornerRadius = UDim.new(0, 18)
+    Corner.Parent = Frame
+
+    local Stroke = Instance.new("UIStroke")
+    Stroke.Thickness = 3
+    Stroke.Parent = Frame
+
+    
+    task.spawn(function()
+        local hue = 0
+        while task.wait(0.03) and Frame.Parent do
+            hue = hue + 0.006
+            if hue > 1 then hue = 0 end
+            Stroke.Color = Color3.fromHSV(hue, 1, 1)
+        end
+    end)
+
+    local paddingX = 15
+    local curY = 10
+
+    
+    local Title = Instance.new("TextLabel")
+    Title.Parent = Frame
+    Title.BackgroundTransparency = 1
+    Title.Position = UDim2.new(0, paddingX, 0, curY)
+    Title.Size = UDim2.new(1, -paddingX*2, 0, 28)
+    Title.Font = Enum.Font.GothamBlack
+    Title.TextSize = 20
+    Title.Text = "เกมที่ไม่รองรับ"
+    Title.TextXAlignment = Enum.TextXAlignment.Left
+    Title.TextYAlignment = Enum.TextYAlignment.Top
+    Title.TextColor3 = Color3.fromRGB(20,20,20)
+
+    curY = curY + 32
+
+    local L1 = Instance.new("TextLabel")
+    L1.Parent = Frame
+    L1.BackgroundTransparency = 1
+    L1.Position = UDim2.new(0, paddingX, 0, curY)
+    L1.Size = UDim2.new(1, -paddingX*2, 0, 44)
+    L1.Font = Enum.Font.Gotham
+    L1.TextSize = 14
+    L1.Text = "เกมนี้ยังไม่รองรับ\nNexus ใช้งานได้กับบางเกมเท่านั้น\nเกมที่คุณเล่นอยู่ตอนนี้ไม่ได้รองรับ"
+    L1.TextXAlignment = Enum.TextXAlignment.Left
+    L1.TextYAlignment = Enum.TextYAlignment.Top
+    L1.TextWrapped = true
+    L1.TextColor3 = Color3.fromRGB(20,20,20)
+
+    curY = curY + 48
+
+    
+    local H1 = Instance.new("TextLabel")
+    H1.Parent = Frame
+    H1.BackgroundTransparency = 1
+    H1.Position = UDim2.new(0, paddingX, 0, curY)
+    H1.Size = UDim2.new(1, -paddingX*2, 0, 24)
+    H1.Font = Enum.Font.GothamBold
+    H1.TextSize = 16
+    H1.Text = "คุณทำอะไรได้บ้าง"
+    H1.TextXAlignment = Enum.TextXAlignment.Left
+    H1.TextYAlignment = Enum.TextYAlignment.Top
+    H1.TextColor3 = Color3.fromRGB(10,10,10)
+
+    curY = curY + 26
+
+    local Bullets = Instance.new("TextLabel")
+    Bullets.Parent = Frame
+    Bullets.BackgroundTransparency = 1
+    Bullets.Position = UDim2.new(0, paddingX + 6, 0, curY)
+    Bullets.Size = UDim2.new(1, -paddingX*2 - 6, 0, 48)
+    Bullets.Font = Enum.Font.Gotham
+    Bullets.TextSize = 13
+    Bullets.Text = "- เข้าร่วมหนึ่งประสบการณ์ที่รองรับด้านล่างนี้\n- หรือขอให้ทีม Nexus เพิ่มเกมนี้"
+    Bullets.TextXAlignment = Enum.TextXAlignment.Left
+    Bullets.TextYAlignment = Enum.TextYAlignment.Top
+    Bullets.TextWrapped = true
+    Bullets.TextColor3 = Color3.fromRGB(20,20,20)
+
+    curY = curY + 52
+
+    
+    local H2 = Instance.new("TextLabel")
+    H2.Parent = Frame
+    H2.BackgroundTransparency = 1
+    H2.Position = UDim2.new(0, paddingX, 0, curY)
+    H2.Size = UDim2.new(1, -paddingX*2, 0, 22)
+    H2.Font = Enum.Font.GothamBold
+    H2.TextSize = 16
+    H2.Text = "เกมที่รองรับ"
+    H2.TextXAlignment = Enum.TextXAlignment.Left
+    H2.TextYAlignment = Enum.TextYAlignment.Top
+    H2.TextColor3 = Color3.fromRGB(10,10,10)
+
+    curY = curY + 24
+
+    
+    local Games = Instance.new("TextLabel")
+    Games.Parent = Frame
+    Games.BackgroundTransparency = 1
+    Games.Position = UDim2.new(0, paddingX + 6, 0, curY)
+    Games.Size = UDim2.new(1, -paddingX*2 - 6, 0, 120) -- ความสูงพอเห็นครบ 10 เกม
+    Games.Font = Enum.Font.Gotham
+    Games.TextSize = 13
+    Games.Text = [[- Blockspin
+- hood life
+- Prison life
+- Arsenal
+- Randomizer
+- Build-a-boat
+- ราชาอาชีวะ
+- murder
+- hide-and-seek
+- trenck-war]]
+    Games.TextXAlignment = Enum.TextXAlignment.Left
+    Games.TextYAlignment = Enum.TextYAlignment.Top
+    Games.TextWrapped = true
+    Games.TextColor3 = Color3.fromRGB(20,20,20)
+
+    
+    local CloseButton = Instance.new("TextButton")
+    CloseButton.Parent = Frame
+    CloseButton.Size = UDim2.new(0, 120, 0, 36)
+    CloseButton.Position = UDim2.new(0.5, -60, 1, -44)
+    CloseButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    CloseButton.Font = Enum.Font.GothamBold
+    CloseButton.Text = "ปิด"
+    CloseButton.TextColor3 = Color3.fromRGB(0, 0, 0)
+    CloseButton.TextSize = 17
+
+    local ButtonCorner = Instance.new("UICorner")
+    ButtonCorner.CornerRadius = UDim.new(0, 12)
+    ButtonCorner.Parent = CloseButton
+
+    CloseButton.MouseButton1Click:Connect(function()
+        if ScreenGui and ScreenGui.Parent then
+            ScreenGui:Destroy()
+        end
+    end)
+end
+
+
+local place = game.PlaceId
+
+if place == 155615604 then
+    loadstring(game:HttpGet("https://pastebin.com/raw/cZm4aJV9"))()
+elseif place == 104715542330896 then
+    loadstring(game:HttpGet("https://pastefy.app/3WBspH0m/raw"))()
+elseif place == 205224386 then
+    loadstring(game:HttpGet("https://pastebin.com/raw/MZmS3MxZ"))()
+elseif place == 138447480994169 then
+    loadstring(game:HttpGet("https://pastebin.com/raw/uB0pXY1Z"))()
+elseif place == 537413528 then
+    loadstring(game:HttpGet("https://pastebin.com/raw/CmXbs4NS"))()
+elseif place == 6654918151 then
+    loadstring(game:HttpGet("https://pastebin.com/raw/fiQ3YGfH"))()
+elseif place == 133090922033564 then
+    loadstring(game:HttpGet("https://pastebin.com/raw/UfwqTekH"))()
+elseif place == 5307215810 then
+    loadstring(game:HttpGet("https://pastebin.com/raw/XH1sj8QU"))()
+elseif place == 142823291 then
+    loadstring(game:HttpGet("https://pastebin.com/raw/HCTc82Tu"))()
+else
+    showNotSupportedUI()
+end
+
+local function showNotSupportedUI()
+    local CoreGui = game:GetService("CoreGui")
+    local ScreenGui = Instance.new("ScreenGui")
+    ScreenGui.Name = "Nexus_NotSupported"
+    ScreenGui.Parent = CoreGui
+
+    local Frame = Instance.new("Frame")
+    Frame.Size = UDim2.new(0, 460, 0, 310)
+    Frame.Position = UDim2.new(0.5, -230, 0.5, -165)
+    Frame.BackgroundColor3 = Color3.fromRGB(180, 215, 255)
+    Frame.BorderSizePixel = 0
+    Frame.Parent = ScreenGui
+
+    local Corner = Instance.new("UICorner")
+    Corner.CornerRadius = UDim.new(0, 18)
+    Corner.Parent = Frame
+
+    local Stroke = Instance.new("UIStroke")
+    Stroke.Thickness = 3
+    Stroke.Parent = Frame
+
+    
+    task.spawn(function()
+        local hue = 0
+        while task.wait(0.03) and Frame.Parent do
+            hue = hue + 0.006
+            if hue > 1 then hue = 0 end
+            Stroke.Color = Color3.fromHSV(hue, 1, 1)
+        end
+    end)
+
+    local paddingX = 15
+    local curY = 10
+
+    
+    local Title = Instance.new("TextLabel")
+    Title.Parent = Frame
+    Title.BackgroundTransparency = 1
+    Title.Position = UDim2.new(0, paddingX, 0, curY)
+    Title.Size = UDim2.new(1, -paddingX*2, 0, 28)
+    Title.Font = Enum.Font.GothamBlack
+    Title.TextSize = 20
+    Title.Text = "เกมที่ไม่รองรับ"
+    Title.TextXAlignment = Enum.TextXAlignment.Left
+    Title.TextYAlignment = Enum.TextYAlignment.Top
+    Title.TextColor3 = Color3.fromRGB(20,20,20)
+
+    curY = curY + 32
+
+    local L1 = Instance.new("TextLabel")
+    L1.Parent = Frame
+    L1.BackgroundTransparency = 1
+    L1.Position = UDim2.new(0, paddingX, 0, curY)
+    L1.Size = UDim2.new(1, -paddingX*2, 0, 44)
+    L1.Font = Enum.Font.Gotham
+    L1.TextSize = 14
+    L1.Text = "เกมนี้ยังไม่รองรับ\nNexus ใช้งานได้กับบางเกมเท่านั้น\nเกมที่คุณเล่นอยู่ตอนนี้ไม่ได้รองรับ"
+    L1.TextXAlignment = Enum.TextXAlignment.Left
+    L1.TextYAlignment = Enum.TextYAlignment.Top
+    L1.TextWrapped = true
+    L1.TextColor3 = Color3.fromRGB(20,20,20)
+
+    curY = curY + 48
+
+    
+    local H1 = Instance.new("TextLabel")
+    H1.Parent = Frame
+    H1.BackgroundTransparency = 1
+    H1.Position = UDim2.new(0, paddingX, 0, curY)
+    H1.Size = UDim2.new(1, -paddingX*2, 0, 24)
+    H1.Font = Enum.Font.GothamBold
+    H1.TextSize = 16
+    H1.Text = "คุณทำอะไรได้บ้าง"
+    H1.TextXAlignment = Enum.TextXAlignment.Left
+    H1.TextYAlignment = Enum.TextYAlignment.Top
+    H1.TextColor3 = Color3.fromRGB(10,10,10)
+
+    curY = curY + 26
+
+    local Bullets = Instance.new("TextLabel")
+    Bullets.Parent = Frame
+    Bullets.BackgroundTransparency = 1
+    Bullets.Position = UDim2.new(0, paddingX + 6, 0, curY)
+    Bullets.Size = UDim2.new(1, -paddingX*2 - 6, 0, 48)
+    Bullets.Font = Enum.Font.Gotham
+    Bullets.TextSize = 13
+    Bullets.Text = "- เข้าร่วมหนึ่งประสบการณ์ที่รองรับด้านล่างนี้\n- หรือขอให้ทีม Nexus เพิ่มเกมนี้"
+    Bullets.TextXAlignment = Enum.TextXAlignment.Left
+    Bullets.TextYAlignment = Enum.TextYAlignment.Top
+    Bullets.TextWrapped = true
+    Bullets.TextColor3 = Color3.fromRGB(20,20,20)
+
+    curY = curY + 52
+
+    
+    local H2 = Instance.new("TextLabel")
+    H2.Parent = Frame
+    H2.BackgroundTransparency = 1
+    H2.Position = UDim2.new(0, paddingX, 0, curY)
+    H2.Size = UDim2.new(1, -paddingX*2, 0, 22)
+    H2.Font = Enum.Font.GothamBold
+    H2.TextSize = 16
+    H2.Text = "เกมที่รองรับ"
+    H2.TextXAlignment = Enum.TextXAlignment.Left
+    H2.TextYAlignment = Enum.TextYAlignment.Top
+    H2.TextColor3 = Color3.fromRGB(10,10,10)
+
+    curY = curY + 24
+
+    
+    local Games = Instance.new("TextLabel")
+    Games.Parent = Frame
+    Games.BackgroundTransparency = 1
+    Games.Position = UDim2.new(0, paddingX + 6, 0, curY)
+    Games.Size = UDim2.new(1, -paddingX*2 - 6, 0, 120) -- ความสูงพอเห็นครบ 10 เกม
+    Games.Font = Enum.Font.Gotham
+    Games.TextSize = 13
+    Games.Text = [[- Blockspin
+- hood life
+- Prison life
+- Arsenal
+- Randomizer
+- Build-a-boat
+- ราชาอาชีวะ
+- murder
+- hide-and-seek
+- trenck-war]]
+    Games.TextXAlignment = Enum.TextXAlignment.Left
+    Games.TextYAlignment = Enum.TextYAlignment.Top
+    Games.TextWrapped = true
+    Games.TextColor3 = Color3.fromRGB(20,20,20)
+
+    
+    local CloseButton = Instance.new("TextButton")
+    CloseButton.Parent = Frame
+    CloseButton.Size = UDim2.new(0, 120, 0, 36)
+    CloseButton.Position = UDim2.new(0.5, -60, 1, -44)
+    CloseButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    CloseButton.Font = Enum.Font.GothamBold
+    CloseButton.Text = "ปิด"
+    CloseButton.TextColor3 = Color3.fromRGB(0, 0, 0)
+    CloseButton.TextSize = 17
+
+    local ButtonCorner = Instance.new("UICorner")
+    ButtonCorner.CornerRadius = UDim.new(0, 12)
+    ButtonCorner.Parent = CloseButton
+
+    CloseButton.MouseButton1Click:Connect(function()
+        if ScreenGui and ScreenGui.Parent then
+            ScreenGui:Destroy()
+        end
+    end)
+end
+
+
+local place = game.PlaceId
+
+if place == 155615604 then
+    loadstring(game:HttpGet("https://pastebin.com/raw/cZm4aJV9"))()
+elseif place == 104715542330896 then
+    loadstring(game:HttpGet("https://pastefy.app/3WBspH0m/raw"))()
+elseif place == 205224386 then
+    loadstring(game:HttpGet("https://pastebin.com/raw/MZmS3MxZ"))()
+elseif place == 138447480994169 then
+    loadstring(game:HttpGet("https://pastebin.com/raw/uB0pXY1Z"))()
+elseif place == 537413528 then
+    loadstring(game:HttpGet("https://pastebin.com/raw/CmXbs4NS"))()
+elseif place == 6654918151 then
+    loadstring(game:HttpGet("https://pastebin.com/raw/fiQ3YGfH"))()
+elseif place == 133090922033564 then
+    loadstring(game:HttpGet("https://pastebin.com/raw/UfwqTekH"))()
+elseif place == 5307215810 then
+    loadstring(game:HttpGet("https://pastebin.com/raw/XH1sj8QU"))()
+elseif place == 142823291 then
+    loadstring(game:HttpGet("https://pastebin.com/raw/HCTc82Tu"))()
+else
+    showNotSupportedUI()
+end
